@@ -171,6 +171,54 @@ sudo systemctl daemon-reload
 sudo systemctl restart quote-box
 ```
 
+#### `Changing to the requested working directory failed: Permission denied`
+
+The service user (`quote-box`) can't traverse INTO your home
+directory to reach the project. Ubuntu sets `/home/<user>` to mode
+0750 by default — owner and group only, no access for others. The
+service runs as `quote-box`, which is in neither group, so it can't
+get through.
+
+The current installer fixes this automatically by running
+`chmod o+x` on each path component up to `/home`. If you're seeing
+this error on an older install:
+
+```bash
+cd /path/to/quote-box
+sudo git pull
+sudo ./install.sh
+```
+
+Or, equivalently, do it by hand:
+
+```bash
+sudo chmod o+x /home/yourusername
+sudo systemctl restart quote-box
+```
+
+This grants traversal (execute, not read) on your home directory.
+The contents stay unlistable to other users; only the path becomes
+walkable. quote-box itself is owned by `quote-box:quote-box` inside
+that dir, so listing requires its own permissions anyway.
+
+#### `Permission denied` when removing the project folder
+
+If you ran an older installer that did `chown -R quote-box:quote-box`
+on the whole project tree, you'll be unable to `rm -rf` your clone
+without `sudo` — your user no longer owns the files.
+
+Current installers chown only `data/` and `backups/` to the service
+user; everything else stays owned by the user who ran `sudo
+./install.sh`. To fix an older install:
+
+```bash
+sudo chown -R yourusername:yourusername /path/to/quote-box
+```
+
+After this you can `git pull`, edit files, and `rm -rf` the project
+normally. Re-running `sudo ./install.sh` will set up the narrower
+ownership.
+
 ## Port already in use <a id="port-in-use"></a>
 
 Find what's holding the port:

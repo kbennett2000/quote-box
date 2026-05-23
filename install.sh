@@ -116,9 +116,42 @@ ensure_config() {
 }
 
 set_ownership() {
-    step "setting ownership to $SERVICE_USER:$SERVICE_USER"
-    chown -R "$SERVICE_USER:$SERVICE_USER" "$INSTALL_DIR"
-    ok "ownership updated"
+    step "setting ownership and traversal permissions"
+
+    # data/ and backups/ are owned by the service user so it can write
+    # to them. Everything else is owned by the installing user — the
+    # service reads source files, config, and venv via filesystem
+    # 'other' perms (default 644/755), and the installer keeps the
+    # ability to git pull, edit, and remove the project later without
+    # sudo. ProtectSystem=strict in the unit blocks writes outside of
+    # ReadWritePaths regardless of ownership.
+    chown -R "$SERVICE_USER:$SERVICE_USER" \
+        "$INSTALL_DIR/data" "$INSTALL_DIR/backups"
+
+    local owner="${SUDO_USER:-root}"
+    local owner_group
+    owner_group="$(id -gn "$owner" 2>/dev/null || echo "$owner")"
+    find "$INSTALL_DIR" -mindepth 1 -maxdepth 1 \
+        ! -name data ! -name backups \
+        -exec chown -R "$owner:$owner_group" {} +
+
+    # If the install dir is under /home/<user>/..., Ubuntu's default
+    # /home/<user> mode of 0750 blocks anyone outside that user's
+    # group (including the service user) from traversing INTO the
+    # home directory to reach the project. Grant world-traversal
+    # (x-only, not r) on each parent up to /home. The home dir's
+    # contents stay unlistable to others; only the path becomes
+    # walkable.
+    if [[ "$INSTALL_DIR" == /home/* ]]; then
+        local p
+        p="$(dirname "$INSTALL_DIR")"
+        while [[ "$p" != "/" && "$p" != "/home" ]]; do
+            chmod o+x "$p" 2>/dev/null || true
+            p="$(dirname "$p")"
+        done
+    fi
+
+    ok "permissions configured (data/+backups/ owned by $SERVICE_USER, rest by $owner)"
 }
 
 install_service_unit() {
