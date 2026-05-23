@@ -1,0 +1,86 @@
+[
+  {
+    "id": "marcus-aurelius-the-happiness-of-your-life",
+    "author": "Marcus Aurelius",
+    "source": "Meditations",
+    "tags": ["wisdom", "life"],
+    "text": "The happiness of your life depends upon the quality of your thoughts."
+  },
+  {
+    "id": "seneca-luck-is-what-happens-when",
+    "author": "Seneca",
+    "source": null,
+    "tags": ["wisdom"],
+    "text": "Luck is what happens when preparation meets opportunity."
+  },
+  {
+    "id": "unknown-be-yourself-everyone-else-is",
+    "author": "Unknown",
+    "source": null,
+    "tags": [],
+    "text": "Be yourself; everyone else is already taken."
+  },
+  {
+    "id": "andre-gide-trust-those-who-seek-the",
+    "author": "André Gide",
+    "source": null,
+    "tags": ["wisdom", "doubt"],
+    "text": "Trust those who seek the truth; doubt those who say they have found it."
+  },
+  {
+    "id": "anonymous-the-only-way-to-do-great",
+    "author": null,
+    "source": null,
+    "tags": ["love", "work"],
+    "text": "The only way to do great work is to love what you do."
+  },
+  {
+    "id": "verbose-author-this-is-an-intentionally-verbose",
+    "author": "Verbose Author",
+    "source": "A Long Essay",
+    "tags": ["philosophy"],
+    "text": "This is an intentionally verbose excerpt designed to exceed two hundred and fifty characters so that the seed and storage layer is exercised on text bodies that contain repeated clauses, layered ideas, and a punctuation density that mirrors what real source material from essays and novels tends to look like in practice."
+  },
+  {
+    "id": "anais-nin-life-shrinks-or-expands-in",
+    "author": "Anaïs Nin",
+    "source": null,
+    "tags": ["courage", "life"],
+    "text": "Life shrinks or expands in proportion to one's courage."
+  },
+  {
+    "id": "amelia-earhart-the-most-difficult-thing-is",
+    "author": "Amelia Earhart",
+    "source": null,
+    "tags": ["courage", "action"],
+    "text": "The most difficult thing is the decision to act, the rest is merely tenacity."
+  },
+  {
+    "id": "mark-twain-the-secret-of-getting-ahead",
+    "author": "Mark Twain",
+    "source": null,
+    "tags": ["action"],
+    "text": "The secret of getting ahead is getting started."
+  },
+  {
+    "id": "rainer-maria-rilke-the-only-journey-is-the",
+    "author": "Rainer Maria Rilke",
+    "source": null,
+    "tags": ["wisdom"],
+    "text": "The only journey is the one within."
+  },
+  {
+    "id": "pablo-picasso-art-washes-away-from-the",
+    "author": "Pablo Picasso",
+    "source": null,
+    "tags": ["art"],
+    "text": "Art washes away from the soul the dust of everyday life."
+  },
+  {
+    "id": "epicurus-death-is-nothing-to-us",
+    "author": "Epicurus",
+    "source": null,
+    "tags": ["death", "philosophy"],
+    "text": "Death is nothing to us."
+  }
+]
