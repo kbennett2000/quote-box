@@ -88,6 +88,18 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Pick a size tier from word count. CSS in display.css supplies the
+// per-tier font-size, line-height, and max-width. Without this, a
+// short quote and an 85-word Steinbeck quote render at identical
+// scale and the long one overflows the viewport on a portrait phone.
+function pickSizeTier(text) {
+  const words = (text || '').trim().split(/\s+/).filter(Boolean).length;
+  if (words <= 25)  return 'lg';
+  if (words <= 60)  return 'md';
+  if (words <= 120) return 'sm';
+  return 'xs';
+}
+
 function renderEmpty() {
   emptyEl.hidden = false;
   quoteEl.hidden = true;
@@ -96,6 +108,8 @@ function renderEmpty() {
 
 function renderQuote(q) {
   state.current = q;
+  quoteEl.classList.remove('quote--lg', 'quote--md', 'quote--sm', 'quote--xs');
+  quoteEl.classList.add('quote--' + pickSizeTier(q.text));
   textEl.textContent = q.text || '';
 
   if (q.author) {
