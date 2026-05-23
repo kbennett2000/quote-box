@@ -1,0 +1,8 @@
+{
+  "port": 8035,
+  "bind_host": "0.0.0.0",
+  "db_path": "data/quotes.db",
+  "seed_json_path": "data/quotes.json",
+  "display_rotation_seconds": 20,
+  "display_transition_ms": 800
+}
