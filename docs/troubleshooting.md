@@ -145,6 +145,32 @@ sudo ./install.sh
 This regenerates `.venv/` and reinstalls dependencies. Your database
 and config are not touched.
 
+#### `Unable to locate executable '/.../.venv/bin/python'`
+
+The systemd service can't see its own venv Python even though the
+file exists on disk. This was a known problem with installs under
+`/home/<user>/...` in older versions of quote-box — `ProtectHome=yes`
+in the unit file hid the home directory from the service.
+
+Pull the latest version (which removes `ProtectHome=yes`) and
+re-run the installer:
+
+```bash
+cd /path/to/quote-box
+sudo git pull
+sudo ./install.sh
+```
+
+If you can't pull (no git, isolated server), edit the unit file
+directly and delete the line `ProtectHome=yes`:
+
+```bash
+sudo nano /etc/systemd/system/quote-box.service
+# Find and delete the line: ProtectHome=yes
+sudo systemctl daemon-reload
+sudo systemctl restart quote-box
+```
+
 ## Port already in use <a id="port-in-use"></a>
 
 Find what's holding the port:

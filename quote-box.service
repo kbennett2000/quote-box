@@ -15,10 +15,13 @@ StandardError=journal
 SyslogIdentifier=quote-box
 
 # Hardening — LAN service, no real auth, defense in depth doesn't hurt.
+# Note: ProtectHome is deliberately NOT set. Installs under /home/<user>/...
+# are common; ProtectHome=yes would make the service unable to see its own
+# venv Python. ProtectSystem=strict still keeps everything outside of
+# ReadWritePaths read-only, so writes are still scoped.
 NoNewPrivileges=yes
 PrivateTmp=yes
 ProtectSystem=strict
-ProtectHome=yes
 ReadWritePaths=__INSTALL_DIR__/data __INSTALL_DIR__/backups
 
 [Install]
