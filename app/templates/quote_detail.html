@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}{{ quote.author or 'Quote' }} — quote-box{% endblock %}
 
+{# The note <li> markup MUST stay aligned with app/static/js/notes.js:renderNote
+   so dynamic re-renders match the server-rendered initial state. #}
+
 {% block content %}
 <a class="detail-back-link" href="/">&larr; Back to all quotes</a>
 
@@ -19,9 +22,48 @@
       {% endfor %}
     </ul>
   {% endif %}
-  <section class="notes-section">
+
+  <section class="notes-section"
+           data-quote-id="{{ quote.id }}"
+           data-current-profile-id="{{ current_profile.id }}">
     <h2>Notes</h2>
-    <p class="notes-coming-soon">(coming soon)</p>
+    <ul id="notes-list" class="notes-list">
+      {% for note in notes %}
+        <li class="note{% if note.profile_id == current_profile.id %} note--mine{% endif %}"
+            data-note-id="{{ note.id }}"
+            data-profile-id="{{ note.profile_id }}">
+          <div class="note-meta">
+            <span class="note-author">{{ note.profile_name }}</span>
+            <time class="note-time"
+                  datetime="{{ note.created_at | to_iso8601 }}"
+                  title="{{ note.created_at }} UTC">{{ note.created_at }}</time>
+          </div>
+          <div class="note-body">{{ note.body }}</div>
+          {% if note.profile_id == current_profile.id %}
+            <div class="note-actions">
+              <button type="button" class="note-edit">Edit</button>
+              <button type="button" class="note-delete">Delete</button>
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+    {% if not notes %}
+      <p id="notes-empty" class="notes-empty">No notes yet.</p>
+    {% endif %}
+
+    <form id="add-note-form" class="add-note-form">
+      <textarea name="body"
+                rows="4"
+                maxlength="10000"
+                required
+                placeholder="Add a note…"></textarea>
+      <button type="submit" disabled>Add note</button>
+    </form>
   </section>
 </article>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/notes.js') }}"></script>
 {% endblock %}

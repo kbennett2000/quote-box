@@ -86,3 +86,53 @@ def test_browse_shows_profile_badge_in_nav(client_with_profile: FlaskClient) -> 
     body = client_with_profile.get("/").get_data(as_text=True)
     assert 'class="profile-badge">tester</span>' in body
     assert "/profile/switch" in body
+
+
+# --- notes section on detail page ---
+
+QUOTE_ID = "epicurus-death-is-nothing-to-us"
+
+
+def test_quote_detail_has_notes_section_and_add_form(
+    client_with_profile: FlaskClient,
+) -> None:
+    body = client_with_profile.get(f"/quotes/{QUOTE_ID}").get_data(as_text=True)
+    assert 'class="notes-section"' in body
+    assert 'id="add-note-form"' in body
+    assert "data-current-profile-id=" in body
+    assert "No notes yet." in body  # empty state
+
+
+def test_quote_detail_renders_existing_notes(
+    client_with_profile: FlaskClient, profile: dict[str, object]
+) -> None:
+    client_with_profile.post(
+        f"/api/quotes/{QUOTE_ID}/notes",
+        json={"profile_id": profile["id"], "body": "memorable line"},
+    )
+    body = client_with_profile.get(f"/quotes/{QUOTE_ID}").get_data(as_text=True)
+    assert "memorable line" in body
+    assert "tester" in body
+    assert 'class="note note--mine"' in body
+    assert 'class="note-edit"' in body
+    assert 'class="note-delete"' in body
+    assert "No notes yet." not in body
+
+
+def test_quote_detail_marks_other_profile_notes_read_only(
+    client_with_profile: FlaskClient, profile: dict[str, object]
+) -> None:
+    other = client_with_profile.post("/api/profiles", json={"name": "bystander"}).get_json()
+    client_with_profile.post(
+        f"/api/quotes/{QUOTE_ID}/notes",
+        json={"profile_id": other["id"], "body": "by someone else"},
+    )
+    body = client_with_profile.get(f"/quotes/{QUOTE_ID}").get_data(as_text=True)
+    assert "by someone else" in body
+    assert "bystander" in body
+    # The note exists but without action buttons for the current viewer.
+    li_index = body.find("by someone else")
+    snippet = body[max(0, li_index - 400) : li_index + 400]
+    assert "note--mine" not in snippet
+    assert "note-edit" not in snippet
+    assert "note-delete" not in snippet

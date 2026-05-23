@@ -51,6 +51,20 @@ def slide_renew_cookie(response: Response) -> Response:
     return response
 
 
+@bp.app_template_filter("to_iso8601")
+def to_iso8601(value: str | None) -> str:
+    """Convert SQLite ``YYYY-MM-DD HH:MM:SS`` (UTC) into a strict ISO-8601 string.
+
+    SQLite's ``CURRENT_TIMESTAMP`` is UTC but emits no timezone marker; we
+    append ``Z`` so the value parses identically in every browser.
+    """
+    if not value:
+        return ""
+    if "T" in value:
+        return value if value.endswith("Z") else value + "Z"
+    return value.replace(" ", "T") + "Z"
+
+
 @bp.get("/")
 @require_profile
 def browse() -> ResponseReturnValue:
@@ -87,10 +101,12 @@ def browse() -> ResponseReturnValue:
 @bp.get("/quotes/<quote_id>")
 @require_profile
 def quote_detail(quote_id: str) -> ResponseReturnValue:
-    quote = queries.get_quote(get_db(), quote_id)
+    db = get_db()
+    quote = queries.get_quote(db, quote_id)
     if quote is None:
         abort(404)
-    return render_template("quote_detail.html", quote=quote)
+    notes = queries.list_notes_for_quote(db, quote_id)
+    return render_template("quote_detail.html", quote=quote, notes=notes)
 
 
 @bp.get("/profile")
