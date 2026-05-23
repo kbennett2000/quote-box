@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>quote-box — display</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/display.css') }}">
+</head>
+<body class="display-body">
+  <main id="display-stage" class="display-stage" data-state="loading">
+    <article id="display-quote" class="display-quote">
+      <q class="display-text" id="display-text"></q>
+      <p class="display-author" id="display-author" hidden></p>
+      <p class="display-source" id="display-source" hidden></p>
+      <ul class="display-tags" id="display-tags" hidden></ul>
+    </article>
+    <div id="display-empty" class="display-empty" hidden>
+      <p class="display-empty-text">No quotes match these filters.</p>
+      <a class="display-empty-link" href="/">Back to all quotes</a>
+    </div>
+  </main>
+
+  <div id="display-controls" class="display-controls">
+    <button type="button" id="ctrl-prev" class="ctrl-button" aria-label="Previous">&lsaquo;</button>
+    <button type="button" id="ctrl-toggle" class="ctrl-button" aria-label="Pause">||</button>
+    <button type="button" id="ctrl-next" class="ctrl-button" aria-label="Next">&rsaquo;</button>
+    <button type="button" id="ctrl-fullscreen" class="ctrl-button" aria-label="Toggle fullscreen">[ ]</button>
+    <label class="ctrl-duration">
+      <span class="ctrl-duration-label" id="ctrl-duration-label">20s</span>
+      <input type="range" id="ctrl-duration" min="5" max="120" step="1" value="20">
+    </label>
+    <a class="ctrl-home" href="/" aria-label="Back to app">&larr;</a>
+  </div>
+
+  <script type="module" src="{{ url_for('static', filename='js/display.js') }}"></script>
+</body>
+</html>

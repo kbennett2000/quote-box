@@ -197,6 +197,47 @@ def test_browse_nav_has_tags_link(client_with_profile: FlaskClient) -> None:
     assert 'href="/tags"' in body
 
 
+# --- display page ---
+
+
+def test_display_returns_200_without_profile(client: FlaskClient) -> None:
+    resp = client.get("/display")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="display-quote"' in body
+    assert 'id="display-controls"' in body
+    assert 'id="display-text"' in body
+    assert "static/css/display.css" in body
+    assert "static/js/display.js" in body
+
+
+def test_display_works_with_profile(client_with_profile: FlaskClient) -> None:
+    resp = client_with_profile.get("/display")
+    assert resp.status_code == 200
+
+
+def test_display_is_standalone_no_site_chrome(client: FlaskClient) -> None:
+    body = client.get("/display").get_data(as_text=True)
+    # Display does not extend base.html — no shared site chrome.
+    assert "site-header" not in body
+    assert "site-footer" not in body
+
+
+def test_display_css_is_self_contained(client: FlaskClient) -> None:
+    resp = client.get("/static/css/display.css")
+    assert resp.status_code == 200
+    text = resp.get_data(as_text=True)
+    # Self-contained: declares fonts itself rather than @import-ing base.css.
+    assert "@font-face" in text
+    assert "fonts/crimson-pro.woff2" in text
+    assert "fonts/inter.woff2" in text
+    # Dark palette anchored on the deep desaturated background.
+    assert "--color-bg:" in text and "#0E0E12" in text
+    # No external URLs.
+    assert "fonts.googleapis.com" not in text
+    assert "fonts.gstatic.com" not in text
+
+
 def test_quote_text_class_uses_pre_line(client: FlaskClient) -> None:
     detail_css = client.get("/static/css/detail.css").get_data(as_text=True)
     browse_css = client.get("/static/css/browse.css").get_data(as_text=True)

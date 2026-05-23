@@ -1,0 +1,203 @@
+/* Self-contained dark theme for the display page. Does not import app.css —
+   /display is a standalone surface with no shared nav/footer. */
+
+@font-face {
+  font-family: 'Crimson Pro';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('../fonts/crimson-pro.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url('../fonts/inter.woff2') format('woff2');
+}
+
+:root {
+  --color-bg:      #0E0E12;
+  --color-text:    #ECE7DA;
+  --color-muted:   #8A8478;
+  --color-chip-bg: rgba(236, 231, 218, 0.06);
+  --transition-ms: 800ms;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+.display-body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  cursor: default;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.display-body.cursor-hidden {
+  cursor: none;
+}
+
+.display-stage {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  padding: 4rem;
+}
+
+.display-quote {
+  width: min(30em, 80vw);
+  max-height: calc(100vh - 8rem);
+  opacity: 0;
+  transition: opacity var(--transition-ms) ease;
+  text-align: left;
+  overflow: hidden;
+}
+
+.display-stage[data-state="visible"] .display-quote {
+  opacity: 1;
+}
+
+.display-text {
+  display: block;
+  font-family: 'Crimson Pro', Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  /* Cap with both vw and vh so long quotes shrink on shorter viewports
+     without surrendering hero scale on big TVs. */
+  font-size: clamp(1.75rem, min(3.5vw, 7vh), 3.5rem);
+  line-height: 1.35;
+  color: var(--color-text);
+  quotes: "\201C" "\201D" "\2018" "\2019";
+  white-space: pre-line;
+}
+
+.display-text::before { content: open-quote; }
+.display-text::after  { content: close-quote; }
+
+.display-author {
+  font-size: 1.25rem;
+  color: var(--color-muted);
+  margin: 2rem 0 0;
+}
+
+.display-author::before { content: "— "; }
+
+.display-source {
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--color-muted);
+  opacity: 0.85;
+  margin: 0.25rem 0 0;
+}
+
+.display-tags {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.display-tag {
+  font-size: 0.875rem;
+  padding: 0.2rem 0.625rem;
+  background: var(--color-chip-bg);
+  color: var(--color-muted);
+  border-radius: 999px;
+}
+
+.display-empty {
+  text-align: center;
+  color: var(--color-muted);
+  font-size: 1.125rem;
+}
+
+.display-empty-link {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--color-text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-muted);
+  padding-bottom: 0.125rem;
+}
+
+/* Controls overlay — bottom-center, idle-fade. */
+
+.display-controls {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms ease;
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.display-controls.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.display-controls[hidden] {
+  display: none !important;
+}
+
+.ctrl-button,
+.ctrl-home {
+  background: transparent;
+  color: var(--color-text);
+  border: none;
+  padding: 0.3rem 0.55rem;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: var(--radius, 4px);
+  text-decoration: none;
+}
+
+.ctrl-button:hover,
+.ctrl-home:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ctrl-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-muted);
+}
+
+.ctrl-duration-label {
+  font-variant-numeric: tabular-nums;
+  min-width: 2.25rem;
+  text-align: right;
+}
+
+.ctrl-duration input[type="range"] {
+  width: 8rem;
+  accent-color: var(--color-text);
+}

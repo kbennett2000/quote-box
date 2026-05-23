@@ -144,6 +144,12 @@ def tags_page() -> ResponseReturnValue:
     return render_template("tags.html", tags=queries.list_tags_with_counts(get_db()))
 
 
+@bp.get("/display")
+def display() -> ResponseReturnValue:
+    # No @require_profile — kiosk surface, intentionally cookie-free.
+    return render_template("display.html")
+
+
 @bp.get("/profile")
 def profile() -> ResponseReturnValue:
     next_url = safe_next(request.args.get("next"))
