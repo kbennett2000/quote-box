@@ -175,6 +175,28 @@ def test_edit_quote_form_without_profile_redirects(client: FlaskClient) -> None:
     assert "/profile?next=" in resp.headers["Location"]
 
 
+def test_tags_page_lists_all_tags(client_with_profile: FlaskClient) -> None:
+    resp = client_with_profile.get("/tags")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="tags-list"' in body
+    # A few fixture tags should appear with their data attributes
+    assert "wisdom" in body
+    assert 'class="tag-rename"' in body
+    assert 'class="tag-delete"' in body
+
+
+def test_tags_page_without_profile_redirects(client: FlaskClient) -> None:
+    resp = client.get("/tags")
+    assert resp.status_code == 302
+    assert resp.headers["Location"].startswith("/profile?next=")
+
+
+def test_browse_nav_has_tags_link(client_with_profile: FlaskClient) -> None:
+    body = client_with_profile.get("/").get_data(as_text=True)
+    assert 'href="/tags"' in body
+
+
 def test_quote_text_class_uses_pre_line(client: FlaskClient) -> None:
     detail_css = client.get("/static/css/detail.css").get_data(as_text=True)
     browse_css = client.get("/static/css/browse.css").get_data(as_text=True)

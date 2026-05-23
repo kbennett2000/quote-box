@@ -1,0 +1,115 @@
+.tags-header {
+  margin-bottom: var(--space-xl);
+}
+
+.tags-heading {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.75rem;
+  margin: 0 0 var(--space-sm);
+}
+
+.tags-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  max-width: 48ch;
+}
+
+.tags-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.tag-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  transition: border-color 120ms ease;
+}
+
+.tag-row:hover {
+  border-color: var(--color-accent);
+}
+
+.tag-row-name {
+  font-size: 0.9375rem;
+  color: var(--color-text);
+}
+
+.tag-row-edit {
+  font: inherit;
+  font-size: 0.9375rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.tag-row-count {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.tag-row-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.tag-row-actions button {
+  font: inherit;
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.625rem;
+  background: transparent;
+  border: var(--border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+}
+
+.tag-rename:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tag-delete {
+  color: #8a3a2a !important;
+  border-color: #c98c7a !important;
+}
+
+.tag-delete:hover {
+  background: #f3e5df;
+}
+
+.tag-row-error {
+  grid-column: 1 / -1;
+  color: #6f2f23;
+  font-size: 0.8125rem;
+  margin: var(--space-xs) 0 0;
+}
+
+.tags-empty {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.nav-link {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: var(--color-text);
+  text-decoration: underline;
+}

@@ -138,6 +138,12 @@ def edit_quote(quote_id: str) -> ResponseReturnValue:
     )
 
 
+@bp.get("/tags")
+@require_profile
+def tags_page() -> ResponseReturnValue:
+    return render_template("tags.html", tags=queries.list_tags_with_counts(get_db()))
+
+
 @bp.get("/profile")
 def profile() -> ResponseReturnValue:
     next_url = safe_next(request.args.get("next"))

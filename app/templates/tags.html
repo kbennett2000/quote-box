@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Tags — quote-box{% endblock %}
+
+{% block content %}
+<header class="tags-header">
+  <h1 class="tags-heading">Tags</h1>
+  <p class="tags-subtitle">Rename or delete tags. Deleting a tag removes it
+    from quotes — the quote text stays untouched.</p>
+</header>
+
+<ul id="tags-list" class="tags-list">
+  {% for t in tags %}
+    <li class="tag-row"
+        data-tag-id="{{ t.id }}"
+        data-tag-name="{{ t.name }}"
+        data-tag-count="{{ t.count }}">
+      <span class="tag-row-name">{{ t.name }}</span>
+      <span class="tag-row-count">{{ t.count }}</span>
+      <div class="tag-row-actions">
+        <button type="button" class="tag-rename">Rename</button>
+        <button type="button" class="tag-delete">Delete</button>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
+{% if not tags %}
+  <p class="tags-empty">No tags yet.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/tags.js') }}"></script>
+{% endblock %}
