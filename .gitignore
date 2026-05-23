@@ -1,0 +1,16 @@
+# Runtime data
+data/quotes.db
+backups/
+
+# Local config
+config.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.pytest_cache/
+
+# OS
+.DS_Store
