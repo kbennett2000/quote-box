@@ -6,18 +6,29 @@ Route handlers do parameter parsing/validation only; all DB work goes through
 
 from __future__ import annotations
 
-from typing import Final
+from typing import Any, Final
 
 from flask import Blueprint, request
 from flask.typing import ResponseReturnValue
 
 from app import queries
 from app.db import get_db
+from app.validation import (
+    ValidationError,
+    optional_str,
+    parse_tags,
+    reject_unknown_fields,
+    require_str,
+)
 
 bp = Blueprint("quotes", __name__)
 
 _DEFAULT_LIMIT: Final[int] = 50
 _MAX_LIMIT: Final[int] = 200
+_MAX_TEXT_LEN: Final[int] = 10000
+_MAX_AUTHOR_LEN: Final[int] = 200
+_MAX_SOURCE_LEN: Final[int] = 500
+_QUOTE_FIELDS: Final[set[str]] = {"text", "author", "source", "tags"}
 
 
 def _parse_int(
@@ -114,3 +125,60 @@ def get_quote(quote_id: str) -> ResponseReturnValue:
     if row is None:
         return {"error": "quote not found"}, 404
     return row
+
+
+def _json_body() -> dict[str, Any] | tuple[dict[str, str], int]:
+    body = request.get_json(silent=True)
+    if not isinstance(body, dict):
+        return {"error": "request body must be a JSON object"}, 400
+    return body
+
+
+@bp.post("/api/quotes")
+def create_quote() -> ResponseReturnValue:
+    body = _json_body()
+    if isinstance(body, tuple):
+        return body
+    try:
+        reject_unknown_fields(body, _QUOTE_FIELDS)
+        text = require_str(body, "text", max_len=_MAX_TEXT_LEN)
+        author = optional_str(body, "author", max_len=_MAX_AUTHOR_LEN)
+        source = optional_str(body, "source", max_len=_MAX_SOURCE_LEN)
+        tags = parse_tags(body)
+    except ValidationError as e:
+        return {"error": e.message}, 400
+
+    row = queries.insert_quote(get_db(), text=text, author=author, source=source, tags=tags)
+    return row, 201
+
+
+@bp.put("/api/quotes/<quote_id>")
+def update_quote(quote_id: str) -> ResponseReturnValue:
+    body = _json_body()
+    if isinstance(body, tuple):
+        return body
+    try:
+        reject_unknown_fields(body, _QUOTE_FIELDS)
+        patch: dict[str, Any] = {}
+        if "text" in body:
+            patch["text"] = require_str(body, "text", max_len=_MAX_TEXT_LEN)
+        if "author" in body:
+            patch["author"] = optional_str(body, "author", max_len=_MAX_AUTHOR_LEN)
+        if "source" in body:
+            patch["source"] = optional_str(body, "source", max_len=_MAX_SOURCE_LEN)
+        if "tags" in body:
+            patch["tags"] = parse_tags(body)
+    except ValidationError as e:
+        return {"error": e.message}, 400
+
+    updated = queries.update_quote(get_db(), quote_id, patch)
+    if updated is None:
+        return {"error": "quote not found"}, 404
+    return updated
+
+
+@bp.delete("/api/quotes/<quote_id>")
+def delete_quote(quote_id: str) -> ResponseReturnValue:
+    if not queries.delete_quote(get_db(), quote_id):
+        return {"error": "quote not found"}, 404
+    return "", 204

@@ -9,7 +9,7 @@ from flask import Flask
 from app.config import load_config
 from app.db import close_db, init_db
 from app.logging_setup import configure_logging
-from app.routes import authors, health, quotes, tags
+from app.routes import authors, health, notes, profiles, quotes, tags
 from app.seed import seed_if_empty
 
 logger = logging.getLogger(__name__)
@@ -44,5 +44,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     app.register_blueprint(quotes.bp)
     app.register_blueprint(tags.bp)
     app.register_blueprint(authors.bp)
+    app.register_blueprint(profiles.bp)
+    app.register_blueprint(notes.bp)
 
     return app
