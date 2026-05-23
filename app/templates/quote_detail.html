@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}{{ quote.author or 'Quote' }} — quote-box{% endblock %}
+
+{% block content %}
+<a class="detail-back-link" href="/">&larr; Back to all quotes</a>
+
+<article class="quote-detail">
+  <blockquote class="quote-detail-text">&ldquo;{{ quote.text }}&rdquo;</blockquote>
+  {% if quote.author or quote.source %}
+    <footer class="quote-detail-meta">
+      {% if quote.author %}<p class="quote-detail-author">{{ quote.author }}</p>{% endif %}
+      {% if quote.source %}<p class="quote-detail-source">{{ quote.source }}</p>{% endif %}
+    </footer>
+  {% endif %}
+  {% if quote.tags %}
+    <ul class="quote-detail-tags">
+      {% for tag in quote.tags %}
+        <li><a class="tag-chip" href="/?tags={{ tag }}">{{ tag }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <section class="notes-section">
+    <h2>Notes</h2>
+    <p class="notes-coming-soon">(coming soon)</p>
+  </section>
+</article>
+{% endblock %}

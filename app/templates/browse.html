@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block title %}Browse — quote-box{% endblock %}
+
+{# Quote-card markup MUST stay aligned with app/static/js/browse.js:renderQuote
+   so dynamic re-renders match the server-rendered initial state. #}
+
+{% block content %}
+<section class="filters">
+  <div class="search-row">
+    <svg class="search-icon" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+      <circle cx="7" cy="7" r="5"></circle>
+      <line x1="11" y1="11" x2="14" y2="14"></line>
+    </svg>
+    <input id="q" class="search-input" type="search" autocomplete="off"
+           placeholder="Search quotes, authors, sources"
+           value="{{ selected_q }}">
+    <button id="search-clear" class="search-clear" type="button" aria-label="Clear search"
+            {% if not selected_q %}hidden{% endif %}>
+      <svg viewBox="0 0 14 14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5">
+        <line x1="3" y1="3" x2="11" y2="11"></line>
+        <line x1="11" y1="3" x2="3" y2="11"></line>
+      </svg>
+    </button>
+  </div>
+  <select id="author" class="author-select" aria-label="Filter by author">
+    <option value="">All authors</option>
+    {% for a in all_authors %}
+      <option value="{{ a.name }}" {% if a.name == selected_author %}selected{% endif %}>
+        {{ a.name }} ({{ a.count }})
+      </option>
+    {% endfor %}
+  </select>
+</section>
+
+<ul class="tag-cloud" aria-label="Tag filters">
+  {% for tag in all_tags %}
+    <li>
+      <button class="tag-chip" type="button"
+              data-tag="{{ tag.name }}"
+              aria-pressed="{{ 'true' if tag.name in selected_tags else 'false' }}">
+        {{ tag.name }} <span class="chip-count">{{ tag.count }}</span>
+      </button>
+    </li>
+  {% endfor %}
+</ul>
+
+<button id="clear-filters" class="clear-filters" type="button"
+        {% if not (selected_q or selected_tags or selected_author) %}hidden{% endif %}>
+  Clear filters
+</button>
+
+<p id="result-count" class="result-count">
+  {% if total == 1 %}1 quote{% else %}{{ total }} quotes{% endif %}
+</p>
+
+<ul id="quotes-grid" class="quotes-grid">
+  {% for q in quotes %}
+    <li>
+      <a class="quote-card" href="/quotes/{{ q.id }}">
+        <p class="quote-card-text">&ldquo;{{ q.text }}&rdquo;</p>
+        {% if q.author or q.source %}
+          <p class="quote-card-meta">
+            {% if q.author %}<span class="quote-card-author">{{ q.author }}</span>{% endif %}
+            {% if q.source %}<span class="quote-card-source">{{ q.source }}</span>{% endif %}
+          </p>
+        {% endif %}
+        {% if q.tags %}
+          <ul class="quote-card-tags">
+            {% for tag in q.tags %}
+              <li><span class="tag-chip">{{ tag }}</span></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </a>
+    </li>
+  {% endfor %}
+</ul>
+
+<div id="empty-holder">
+  {% if not quotes %}
+    <div class="empty-state">No quotes match these filters.</div>
+  {% endif %}
+</div>
+
+<nav class="pagination" aria-label="Pagination">
+  <button id="prev-page" type="button" {% if page <= 1 %}disabled{% endif %}>&larr; Prev</button>
+  <span id="pagination-position" class="pagination-position">Page {{ page }} of {{ total_pages }}</span>
+  <button id="next-page" type="button" {% if page >= total_pages %}disabled{% endif %}>Next &rarr;</button>
+</nav>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/browse.js') }}"></script>
+{% endblock %}

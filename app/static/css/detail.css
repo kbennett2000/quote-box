@@ -1,0 +1,79 @@
+.quote-detail {
+  max-width: var(--measure);
+}
+
+.quote-detail-text {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--color-text);
+  margin: 0;
+  padding-left: var(--space-xl);
+  border-left: 2px solid var(--color-border);
+}
+
+.quote-detail-meta {
+  margin-top: var(--space-lg);
+  padding-left: var(--space-xl);
+  color: var(--color-text-muted);
+}
+
+.quote-detail-author {
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.quote-detail-author::before {
+  content: "— ";
+}
+
+.quote-detail-source {
+  font-style: italic;
+  font-size: 0.9375rem;
+  margin-top: var(--space-xs);
+}
+
+.quote-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-lg);
+  padding: 0 0 0 var(--space-xl);
+  list-style: none;
+}
+
+.notes-section {
+  margin-top: var(--space-xxl);
+  padding-top: var(--space-lg);
+  border-top: var(--border);
+}
+
+.notes-section h2 {
+  font-size: 1.125rem;
+  margin-bottom: var(--space-sm);
+}
+
+.notes-coming-soon {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.detail-back-link {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 700px) {
+  .quote-detail-text {
+    font-size: 1.375rem;
+    padding-left: var(--space-md);
+  }
+  .quote-detail-meta,
+  .quote-detail-tags {
+    padding-left: var(--space-md);
+  }
+}
