@@ -119,6 +119,69 @@ def test_quote_detail_renders_existing_notes(
     assert "No notes yet." not in body
 
 
+# --- add/edit/delete UI ---
+
+
+def test_browse_has_add_quote_button(client_with_profile: FlaskClient) -> None:
+    body = client_with_profile.get("/").get_data(as_text=True)
+    assert 'href="/quotes/new"' in body
+    assert "+ Add quote" in body
+
+
+def test_detail_has_edit_link(client_with_profile: FlaskClient) -> None:
+    body = client_with_profile.get(f"/quotes/{QUOTE_ID}").get_data(as_text=True)
+    assert f'href="/quotes/{QUOTE_ID}/edit"' in body
+
+
+def test_new_quote_form_renders(client_with_profile: FlaskClient) -> None:
+    resp = client_with_profile.get("/quotes/new")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="quote-form"' in body
+    assert 'data-mode="new"' in body
+    assert "data-quote-id" not in body
+    assert 'id="delete-quote"' not in body
+
+
+def test_new_quote_form_without_profile_redirects(client: FlaskClient) -> None:
+    resp = client.get("/quotes/new")
+    assert resp.status_code == 302
+    assert resp.headers["Location"].startswith("/profile?next=")
+
+
+def test_edit_quote_form_prefilled(client_with_profile: FlaskClient) -> None:
+    resp = client_with_profile.get(f"/quotes/{QUOTE_ID}/edit")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'data-mode="edit"' in body
+    assert f'data-quote-id="{QUOTE_ID}"' in body
+    assert "Death is nothing to us" in body
+    assert "Epicurus" in body
+    # initial tags array embedded for the chip widget
+    assert "data-initial-tags=" in body
+    assert "death" in body and "philosophy" in body
+    # Delete button only in edit mode
+    assert 'id="delete-quote"' in body
+
+
+def test_edit_quote_form_missing_id_404(client_with_profile: FlaskClient) -> None:
+    resp = client_with_profile.get("/quotes/does-not-exist/edit")
+    assert resp.status_code == 404
+
+
+def test_edit_quote_form_without_profile_redirects(client: FlaskClient) -> None:
+    resp = client.get(f"/quotes/{QUOTE_ID}/edit")
+    assert resp.status_code == 302
+    assert "/profile?next=" in resp.headers["Location"]
+
+
+def test_quote_text_class_uses_pre_line(client: FlaskClient) -> None:
+    detail_css = client.get("/static/css/detail.css").get_data(as_text=True)
+    browse_css = client.get("/static/css/browse.css").get_data(as_text=True)
+    assert "white-space: pre-line" in detail_css
+    assert "white-space: pre-line" in browse_css
+
+
 def test_quote_detail_marks_other_profile_notes_read_only(
     client_with_profile: FlaskClient, profile: dict[str, object]
 ) -> None:

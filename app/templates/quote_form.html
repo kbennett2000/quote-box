@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% set is_edit = mode == "edit" %}
+{% block title %}{{ "Edit" if is_edit else "Add" }} quote — quote-box{% endblock %}
+
+{% block content %}
+<header class="form-header">
+  <h1 class="form-title">{{ "Edit quote" if is_edit else "Add a quote" }}</h1>
+  {% if is_edit %}
+    <a class="cancel-link" href="/quotes/{{ quote.id }}">&larr; Back to quote</a>
+  {% else %}
+    <a class="cancel-link" href="/">&larr; Back to all quotes</a>
+  {% endif %}
+</header>
+
+<form id="quote-form"
+      class="quote-form"
+      data-mode="{{ mode }}"
+      {% if is_edit %}data-quote-id="{{ quote.id }}"{% endif %}>
+  <noscript>
+    <p class="form-error">
+      Adding and editing quotes requires JavaScript.
+      You can still use the JSON API at <code>/api/quotes</code> directly.
+    </p>
+  </noscript>
+  <div id="form-error" class="form-error" hidden></div>
+
+  <label class="field">
+    <span class="field-label">Text</span>
+    <textarea name="text" rows="6" required maxlength="10000"
+              placeholder="The quote itself">{{ quote.text if quote else "" }}</textarea>
+  </label>
+
+  <label class="field">
+    <span class="field-label">Author <span class="field-hint">(optional)</span></span>
+    <input type="text" name="author" maxlength="200" list="author-list"
+           autocomplete="off"
+           value="{{ quote.author if quote and quote.author else '' }}">
+  </label>
+  <datalist id="author-list">
+    {% for a in all_authors %}<option value="{{ a.name }}">{% endfor %}
+  </datalist>
+
+  <label class="field">
+    <span class="field-label">Source <span class="field-hint">(optional)</span></span>
+    <input type="text" name="source" maxlength="500"
+           autocomplete="off"
+           placeholder="Book, essay, talk…"
+           value="{{ quote.source if quote and quote.source else '' }}">
+  </label>
+
+  <div class="field">
+    <span class="field-label">Tags</span>
+    <div class="tag-input"
+         data-initial-tags='{{ (quote.tags if quote else []) | tojson }}'>
+      <ul class="tag-input-chips"></ul>
+      <input type="text" class="tag-input-field" maxlength="50"
+             placeholder="Type a tag and press Enter" autocomplete="off">
+      <ul class="tag-input-suggestions" hidden></ul>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="primary">
+      {{ "Save changes" if is_edit else "Add quote" }}
+    </button>
+    {% if is_edit %}
+      <button type="button" id="delete-quote" class="danger">Delete</button>
+    {% endif %}
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script type="module"
+        id="quote-form-script"
+        data-all-tags='{{ (all_tags | map(attribute="name") | list) | tojson }}'
+        src="{{ url_for('static', filename='js/quote_form.js') }}"></script>
+{% endblock %}

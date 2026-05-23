@@ -5,7 +5,10 @@
    so dynamic re-renders match the server-rendered initial state. #}
 
 {% block content %}
-<a class="detail-back-link" href="/">&larr; Back to all quotes</a>
+<div class="detail-toolbar">
+  <a class="detail-back-link" href="/">&larr; Back to all quotes</a>
+  <a class="detail-edit-link" href="/quotes/{{ quote.id }}/edit">Edit</a>
+</div>
 
 <article class="quote-detail">
   <blockquote class="quote-detail-text">&ldquo;{{ quote.text }}&rdquo;</blockquote>

@@ -109,6 +109,35 @@ def quote_detail(quote_id: str) -> ResponseReturnValue:
     return render_template("quote_detail.html", quote=quote, notes=notes)
 
 
+@bp.get("/quotes/new")
+@require_profile
+def new_quote() -> ResponseReturnValue:
+    db = get_db()
+    return render_template(
+        "quote_form.html",
+        mode="new",
+        quote=None,
+        all_authors=queries.list_authors_with_counts(db),
+        all_tags=queries.list_tags_with_counts(db),
+    )
+
+
+@bp.get("/quotes/<quote_id>/edit")
+@require_profile
+def edit_quote(quote_id: str) -> ResponseReturnValue:
+    db = get_db()
+    quote = queries.get_quote(db, quote_id)
+    if quote is None:
+        abort(404)
+    return render_template(
+        "quote_form.html",
+        mode="edit",
+        quote=quote,
+        all_authors=queries.list_authors_with_counts(db),
+        all_tags=queries.list_tags_with_counts(db),
+    )
+
+
 @bp.get("/profile")
 def profile() -> ResponseReturnValue:
     next_url = safe_next(request.args.get("next"))

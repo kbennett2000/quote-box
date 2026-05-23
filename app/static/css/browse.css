@@ -1,3 +1,26 @@
+.browse-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-md);
+}
+
+.add-quote-button {
+  font: inherit;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.875rem;
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+
+.add-quote-button:hover {
+  background: var(--color-accent);
+  color: #fff;
+  text-decoration: none;
+}
+
 .filters {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -173,6 +196,7 @@ a.tag-chip:hover {
   font-size: 1.125rem;
   line-height: 1.55;
   max-width: var(--measure);
+  white-space: pre-line;
 }
 
 .quote-card-meta {

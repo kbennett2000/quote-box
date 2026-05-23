@@ -1,0 +1,215 @@
+.form-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+}
+
+.form-title {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.cancel-link {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+}
+
+.cancel-link:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.quote-form {
+  max-width: 640px;
+  display: grid;
+  gap: var(--space-lg);
+}
+
+.field {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.field-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-left: var(--space-xs);
+}
+
+.quote-form input[type="text"],
+.quote-form textarea {
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  padding: var(--space-sm) var(--space-md);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  color: var(--color-text);
+  width: 100%;
+}
+
+.quote-form textarea {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  resize: vertical;
+  min-height: 8rem;
+}
+
+.tag-input {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+  border: var(--border);
+  border-radius: var(--radius);
+  background: var(--color-surface);
+  min-height: 2.5rem;
+}
+
+.tag-input:focus-within {
+  border-color: var(--color-accent);
+}
+
+.tag-input-chips {
+  display: contents;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-input-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.8125rem;
+  padding: 0.2rem 0.5rem 0.2rem 0.625rem;
+  background: var(--color-chip-bg);
+  border-radius: 999px;
+  color: var(--color-text);
+}
+
+.tag-input-chip-remove {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.tag-input-chip-remove:hover {
+  color: var(--color-text);
+}
+
+.tag-input-field {
+  flex: 1;
+  min-width: 8rem;
+  border: none !important;
+  background: transparent !important;
+  padding: var(--space-xs) 0 !important;
+  font: inherit;
+  outline: none;
+}
+
+.tag-input-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: var(--space-xs);
+  z-index: 10;
+  list-style: none;
+  padding: var(--space-xs) 0;
+  background: var(--color-surface);
+  border: var(--border);
+  border-radius: var(--radius);
+  max-height: 14rem;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(31, 27, 22, 0.06);
+}
+
+.tag-input-suggestion {
+  padding: var(--space-xs) var(--space-md);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.tag-input-suggestion:hover {
+  background: var(--color-chip-bg);
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.quote-form button.primary {
+  font: inherit;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-accent);
+  color: #fff;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius);
+}
+
+.quote-form button.primary:hover {
+  opacity: 0.9;
+}
+
+.quote-form button.danger {
+  margin-left: auto;
+  font: inherit;
+  padding: var(--space-sm) var(--space-lg);
+  background: transparent;
+  color: #8a3a2a;
+  border: 1px solid #c98c7a;
+  border-radius: var(--radius);
+}
+
+.quote-form button.danger:hover {
+  background: #f3e5df;
+}
+
+.form-error {
+  padding: var(--space-sm) var(--space-md);
+  background: #f6e7e1;
+  border-left: 3px solid #8a3a2a;
+  color: #6f2f23;
+  font-size: 0.875rem;
+  border-radius: var(--radius);
+  margin-bottom: var(--space-sm);
+}
+
+.form-error code {
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 700px) {
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+}
