@@ -1,0 +1,25 @@
+[Unit]
+Description=quote-box quote display app
+After=network.target
+
+[Service]
+Type=simple
+User=quote-box
+Group=quote-box
+WorkingDirectory=__INSTALL_DIR__
+ExecStart=__INSTALL_DIR__/.venv/bin/python -m app
+Restart=on-failure
+RestartSec=5s
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=quote-box
+
+# Hardening — LAN service, no real auth, defense in depth doesn't hurt.
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=__INSTALL_DIR__/data __INSTALL_DIR__/backups
+
+[Install]
+WantedBy=multi-user.target
