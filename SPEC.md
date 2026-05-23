@@ -309,3 +309,9 @@ These I want your call on before Claude Code starts:
 5. **Display mode duration in the UI**: I made it config-file only. Want a UI toggle on the display page (slider in the controls) that overrides per-session?
 6. **Should the install script create the `quotes` system user**, or should the docs walk through creating it manually? Auto-create is friendlier; manual is more explicit.
 7. **Backup**: just document "copy the SQLite file" — or include a `backup.sh` script that timestamps and saves to `backups/`?
+
+---
+
+## 12. Known limitations
+
+- The add/edit quote form requires JavaScript. No-JS users can POST/PUT/DELETE against `/api/quotes` directly. See `docs/admin.md` when written.
