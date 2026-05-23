@@ -2,13 +2,30 @@ from __future__ import annotations
 
 import sqlite3
 
+import pytest
+
 from app.queries import (
+    ConflictError,
+    delete_note,
+    delete_profile,
+    delete_quote,
+    delete_tag,
+    get_note,
     get_quote,
+    get_tag,
+    insert_note,
+    insert_profile,
+    insert_quote,
     list_authors_with_counts,
+    list_notes_for_quote,
+    list_profiles,
     list_quotes,
     list_tags_with_counts,
     random_quote,
+    rename_tag,
     shuffle_ids,
+    update_note,
+    update_quote,
 )
 
 # Constants tracking tests/fixtures/quotes_sample.json:
@@ -156,3 +173,164 @@ def test_list_authors_with_counts_excludes_null(seeded_db: sqlite3.Connection) -
     names = [a["name"] for a in authors]
     assert names == sorted(names)
     assert None not in names
+
+
+# ---------------------------------------------------------------------------
+# Write-side query tests
+# ---------------------------------------------------------------------------
+
+
+def test_insert_quote_with_new_and_existing_tags(seeded_db: sqlite3.Connection) -> None:
+    row = insert_quote(
+        seeded_db,
+        text="The unexamined life is not worth living.",
+        author="Socrates",
+        source=None,
+        tags=["wisdom", "newly-coined"],  # wisdom exists; newly-coined is new
+    )
+    assert row["id"] == "socrates-the-unexamined-life-is-not"
+    assert row["tags"] == ["newly-coined", "wisdom"]
+    # 'newly-coined' inserted into tags table.
+    assert (
+        seeded_db.execute(
+            "SELECT COUNT(*) AS n FROM tags WHERE name = ?", ("newly-coined",)
+        ).fetchone()["n"]
+        == 1
+    )
+
+
+def test_insert_quote_slug_collision_appends_suffix(seeded_db: sqlite3.Connection) -> None:
+    first = insert_quote(seeded_db, text="Hello world", author="Alice", source=None, tags=None)
+    second = insert_quote(seeded_db, text="Hello world", author="Alice", source=None, tags=None)
+    assert first["id"] == "alice-hello-world"
+    assert second["id"] == "alice-hello-world-2"
+
+
+def test_update_quote_text_only_leaves_tags(seeded_db: sqlite3.Connection) -> None:
+    before = get_quote(seeded_db, "seneca-luck-is-what-happens-when")
+    assert before is not None
+    updated = update_quote(
+        seeded_db, "seneca-luck-is-what-happens-when", {"text": "Luck favors the prepared."}
+    )
+    assert updated is not None
+    assert updated["text"] == "Luck favors the prepared."
+    assert updated["tags"] == before["tags"]
+
+
+def test_update_quote_empty_tags_clears_them(seeded_db: sqlite3.Connection) -> None:
+    updated = update_quote(seeded_db, "marcus-aurelius-the-happiness-of-your-life", {"tags": []})
+    assert updated is not None
+    assert updated["tags"] == []
+
+
+def test_update_quote_returns_none_for_missing(seeded_db: sqlite3.Connection) -> None:
+    assert update_quote(seeded_db, "no-such-quote", {"text": "x"}) is None
+
+
+def test_delete_quote_cascades(seeded_db: sqlite3.Connection) -> None:
+    # Seed a profile + note + tag attachment on a known quote.
+    profile = insert_profile(seeded_db, "alice")
+    quote_id = "marcus-aurelius-the-happiness-of-your-life"
+    insert_note(seeded_db, quote_id=quote_id, profile_id=profile["id"], body="memorable")
+
+    assert delete_quote(seeded_db, quote_id) is True
+    assert get_quote(seeded_db, quote_id) is None
+    assert (
+        seeded_db.execute(
+            "SELECT COUNT(*) AS n FROM notes WHERE quote_id = ?", (quote_id,)
+        ).fetchone()["n"]
+        == 0
+    )
+    assert (
+        seeded_db.execute(
+            "SELECT COUNT(*) AS n FROM quote_tags WHERE quote_id = ?", (quote_id,)
+        ).fetchone()["n"]
+        == 0
+    )
+
+
+def test_delete_quote_missing_returns_false(seeded_db: sqlite3.Connection) -> None:
+    assert delete_quote(seeded_db, "no-such-quote") is False
+
+
+def test_rename_tag_happy_path(seeded_db: sqlite3.Connection) -> None:
+    wisdom = seeded_db.execute("SELECT id FROM tags WHERE name = 'wisdom'").fetchone()
+    renamed = rename_tag(seeded_db, int(wisdom["id"]), "sagacity")
+    assert renamed is not None
+    assert renamed["name"] == "sagacity"
+
+
+def test_rename_tag_to_existing_raises_conflict(seeded_db: sqlite3.Connection) -> None:
+    wisdom = seeded_db.execute("SELECT id FROM tags WHERE name = 'wisdom'").fetchone()
+    with pytest.raises(ConflictError):
+        rename_tag(seeded_db, int(wisdom["id"]), "life")
+
+
+def test_rename_tag_idempotent_to_same_name(seeded_db: sqlite3.Connection) -> None:
+    wisdom = seeded_db.execute("SELECT id FROM tags WHERE name = 'wisdom'").fetchone()
+    result = rename_tag(seeded_db, int(wisdom["id"]), "wisdom")
+    assert result == {"id": int(wisdom["id"]), "name": "wisdom"}
+
+
+def test_rename_tag_missing_returns_none(seeded_db: sqlite3.Connection) -> None:
+    assert rename_tag(seeded_db, 999_999, "anything") is None
+
+
+def test_delete_tag_cascades_to_quote_tags_only(seeded_db: sqlite3.Connection) -> None:
+    wisdom = seeded_db.execute("SELECT id FROM tags WHERE name = 'wisdom'").fetchone()
+    assert delete_tag(seeded_db, int(wisdom["id"])) is True
+    # The quote itself still exists with other tags intact.
+    quote = get_quote(seeded_db, "marcus-aurelius-the-happiness-of-your-life")
+    assert quote is not None
+    assert "wisdom" not in quote["tags"]
+    assert "life" in quote["tags"]
+
+
+def test_insert_profile_collision_raises(seeded_db: sqlite3.Connection) -> None:
+    insert_profile(seeded_db, "kasey")
+    with pytest.raises(ConflictError):
+        insert_profile(seeded_db, "kasey")
+
+
+def test_list_profiles_after_inserts(seeded_db: sqlite3.Connection) -> None:
+    a = insert_profile(seeded_db, "alice")
+    b = insert_profile(seeded_db, "bob")
+    profiles = list_profiles(seeded_db)
+    assert [p["name"] for p in profiles] == ["alice", "bob"]
+    assert profiles[0]["id"] == a["id"]
+    assert profiles[1]["id"] == b["id"]
+
+
+def test_delete_profile_cascades_to_notes(seeded_db: sqlite3.Connection) -> None:
+    profile = insert_profile(seeded_db, "alice")
+    quote_id = "marcus-aurelius-the-happiness-of-your-life"
+    insert_note(seeded_db, quote_id=quote_id, profile_id=profile["id"], body="hi")
+    assert delete_profile(seeded_db, profile["id"]) is True
+    assert list_notes_for_quote(seeded_db, quote_id) == []
+
+
+def test_notes_full_lifecycle_and_ordering(seeded_db: sqlite3.Connection) -> None:
+    profile = insert_profile(seeded_db, "alice")
+    quote_id = "marcus-aurelius-the-happiness-of-your-life"
+    n1 = insert_note(seeded_db, quote_id=quote_id, profile_id=profile["id"], body="first")
+    n2 = insert_note(seeded_db, quote_id=quote_id, profile_id=profile["id"], body="second")
+    notes = list_notes_for_quote(seeded_db, quote_id)
+    assert [n["id"] for n in notes] == [n1["id"], n2["id"]]
+    assert notes[0]["profile_name"] == "alice"
+
+    updated = update_note(seeded_db, n1["id"], "first (edited)")
+    assert updated is not None
+    assert updated["body"] == "first (edited)"
+
+    assert get_note(seeded_db, n2["id"]) is not None
+    assert delete_note(seeded_db, n2["id"]) is True
+    assert get_note(seeded_db, n2["id"]) is None
+    assert len(list_notes_for_quote(seeded_db, quote_id)) == 1
+
+
+def test_update_note_missing_returns_none(seeded_db: sqlite3.Connection) -> None:
+    assert update_note(seeded_db, 999_999, "no-op") is None
+
+
+def test_delete_note_missing_returns_false(seeded_db: sqlite3.Connection) -> None:
+    assert delete_note(seeded_db, 999_999) is False
