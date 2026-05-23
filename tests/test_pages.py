@@ -197,6 +197,41 @@ def test_browse_nav_has_tags_link(client_with_profile: FlaskClient) -> None:
     assert 'href="/tags"' in body
 
 
+# --- display settings page ---
+
+
+def test_display_settings_renders_with_profile(client_with_profile: FlaskClient) -> None:
+    resp = client_with_profile.get("/display/settings")
+    assert resp.status_code == 200
+    body = resp.get_data(as_text=True)
+    assert 'id="display-settings-form"' in body
+    assert 'id="ds-duration"' in body
+    assert 'id="ds-author"' in body
+    assert 'id="ds-url-preview"' in body
+    assert 'id="ds-tag-mode-group"' in body
+    assert "static/js/display_settings.js" in body
+
+
+def test_display_settings_without_profile_redirects(client: FlaskClient) -> None:
+    resp = client.get("/display/settings")
+    assert resp.status_code == 302
+    assert resp.headers["Location"].startswith("/profile?next=")
+
+
+def test_browse_nav_has_display_link(client_with_profile: FlaskClient) -> None:
+    body = client_with_profile.get("/").get_data(as_text=True)
+    assert 'href="/display/settings"' in body
+    # Nav link to the bare /display page is intentionally absent —
+    # users land on the settings launcher, then start from there.
+    assert ">Display</a>" in body
+
+
+def test_display_settings_active_nav(client_with_profile: FlaskClient) -> None:
+    body = client_with_profile.get("/display/settings").get_data(as_text=True)
+    # Active-state class should be applied to the Display nav link.
+    assert "nav-link--active" in body
+
+
 # --- display page ---
 
 

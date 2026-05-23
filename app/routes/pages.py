@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any, Final
 
-from flask import Blueprint, abort, redirect, render_template, request
+from flask import Blueprint, abort, current_app, redirect, render_template, request
 from flask.typing import ResponseReturnValue
 from werkzeug.wrappers import Response
 
@@ -148,6 +148,19 @@ def tags_page() -> ResponseReturnValue:
 def display() -> ResponseReturnValue:
     # No @require_profile — kiosk surface, intentionally cookie-free.
     return render_template("display.html")
+
+
+@bp.get("/display/settings")
+@require_profile
+def display_settings() -> ResponseReturnValue:
+    db = get_db()
+    cfg = current_app.config["QUOTE_BOX"]
+    return render_template(
+        "display_settings.html",
+        default_duration=cfg["display_rotation_seconds"],
+        all_authors=queries.list_authors_with_counts(db),
+        all_tags=queries.list_tags_with_counts(db),
+    )
 
 
 @bp.get("/profile")

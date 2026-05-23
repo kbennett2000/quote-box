@@ -13,7 +13,10 @@
       <a class="site-wordmark" href="/">Quotes</a>
       <nav class="site-nav">
         {% if current_profile %}
-          <a class="nav-link" href="/tags">Tags</a>
+          <a class="nav-link {% if request.path == '/tags' %}nav-link--active{% endif %}"
+             href="/tags">Tags</a>
+          <a class="nav-link {% if request.path == '/display/settings' %}nav-link--active{% endif %}"
+             href="/display/settings">Display</a>
           <span class="profile-badge">{{ current_profile.name }}</span>
           <form action="/profile/switch" method="post" class="switch-form">
             <button type="submit" class="switch-link">Switch</button>

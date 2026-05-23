@@ -37,6 +37,7 @@ const state = {
   pauseRemainingMs: null,
   wakeLock: null,
   filterParams: new URLSearchParams(),
+  tagMode: 'or',
   showTags: false,
   noControls: false,
   current: null,
@@ -55,6 +56,8 @@ function readUrlState() {
     durationInput.value = String(clamped);
     durationLabel.textContent = clamped + 's';
   }
+  const rawTagMode = (url.get('tag_mode') || 'or').toLowerCase();
+  state.tagMode = rawTagMode === 'and' ? 'and' : 'or';
   state.showTags = url.get('show_tags') === '1';
   state.noControls = url.get('nocontrols') === '1';
   if (state.noControls) controls.hidden = true;
@@ -62,7 +65,7 @@ function readUrlState() {
 
 async function fetchQueue() {
   const params = new URLSearchParams(state.filterParams);
-  params.set('tag_mode', 'or');
+  params.set('tag_mode', state.tagMode);
   try {
     const resp = await fetch('/api/quotes/shuffle?' + params.toString());
     if (!resp.ok) return [];

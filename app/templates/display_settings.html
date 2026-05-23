@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Display settings — quote-box{% endblock %}
+
+{% block content %}
+<header class="form-header">
+  <h1 class="form-title">Display settings</h1>
+  <a class="cancel-link" href="/">&larr; Back to all quotes</a>
+</header>
+
+<form id="display-settings-form"
+      class="display-settings-form"
+      data-default-duration="{{ default_duration }}">
+
+  <div class="field">
+    <label class="field-label" for="ds-duration">
+      Rotation duration
+      <span class="field-hint" id="ds-duration-value">{{ default_duration }}s</span>
+    </label>
+    <input id="ds-duration" type="range" min="5" max="120" step="1"
+           value="{{ default_duration }}">
+  </div>
+
+  <label class="field">
+    <span class="field-label">Filter by author</span>
+    <select id="ds-author" class="author-select">
+      <option value="">All authors</option>
+      {% for a in all_authors %}
+        <option value="{{ a.name }}">{{ a.name }} ({{ a.count }})</option>
+      {% endfor %}
+    </select>
+  </label>
+
+  <div class="field">
+    <span class="field-label">Filter by tags</span>
+    <div class="tag-input" data-initial-tags='[]'>
+      <ul class="tag-input-chips"></ul>
+      <input type="text" class="tag-input-field" maxlength="50"
+             placeholder="Type a tag and press Enter" autocomplete="off">
+      <ul class="tag-input-suggestions" hidden></ul>
+    </div>
+  </div>
+
+  <fieldset id="ds-tag-mode-group" class="field tag-mode-group" disabled>
+    <legend class="field-label">When multiple tags are picked</legend>
+    <label class="radio-row">
+      <input type="radio" name="tag_mode" value="or" checked>
+      Any of these tags <span class="field-hint">(more variety)</span>
+    </label>
+    <label class="radio-row">
+      <input type="radio" name="tag_mode" value="and">
+      All of these tags <span class="field-hint">(narrow filter)</span>
+    </label>
+  </fieldset>
+
+  <label class="checkbox-row">
+    <input id="ds-show-tags" type="checkbox">
+    Show tag chips under each quote
+  </label>
+
+  <div class="field">
+    <label class="checkbox-row">
+      <input id="ds-nocontrols" type="checkbox">
+      Hide controls (kiosk mode)
+    </label>
+    <p class="field-hint field-hint--block">
+      Hides the controls bar entirely. Keyboard shortcuts (Space,
+      arrow keys, F for fullscreen) still work. Close the tab or
+      press Esc to exit fullscreen to leave.
+    </p>
+  </div>
+
+  <div class="field">
+    <span class="field-label">Generated URL</span>
+    <input id="ds-url-preview" type="text" readonly
+           aria-label="Generated display URL — click to select for copying">
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="primary">Start display</button>
+    <a class="cancel-link" href="/display/settings">Reset</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script type="module"
+        id="ds-script"
+        data-all-tags='{{ (all_tags | map(attribute="name") | list) | tojson }}'
+        src="{{ url_for('static', filename='js/display_settings.js') }}"></script>
+{% endblock %}
