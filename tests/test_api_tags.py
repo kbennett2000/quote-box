@@ -12,12 +12,15 @@ def test_list_tags_returns_all(client: FlaskClient) -> None:
     assert isinstance(body, list)
     assert len(body) == TOTAL_TAGS
     for entry in body:
-        assert set(entry.keys()) == {"name", "count"}
+        assert set(entry.keys()) == {"id", "name", "count"}
+    assert isinstance(body[0]["id"], int) and body[0]["id"] > 0
 
 
 def test_list_tags_first_entry_is_top_count(client: FlaskClient) -> None:
     body = client.get("/api/tags").get_json()
-    assert body[0] == {"name": "wisdom", "count": 4}
+    assert body[0]["name"] == "wisdom"
+    assert body[0]["count"] == 4
+    assert isinstance(body[0]["id"], int)
 
 
 def test_list_tags_sort_order(client: FlaskClient) -> None:

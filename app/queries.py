@@ -31,6 +31,7 @@ class QuoteRow(TypedDict):
 
 
 class TagCount(TypedDict):
+    id: int
     name: str
     count: int
 
@@ -219,12 +220,12 @@ def shuffle_ids(
 
 def list_tags_with_counts(conn: sqlite3.Connection) -> list[TagCount]:
     rows = conn.execute(
-        "SELECT t.name, COUNT(qt.quote_id) AS count "
+        "SELECT t.id AS id, t.name, COUNT(qt.quote_id) AS count "
         "FROM tags t LEFT JOIN quote_tags qt ON qt.tag_id = t.id "
         "GROUP BY t.id, t.name "
         "ORDER BY count DESC, name ASC"
     ).fetchall()
-    return [TagCount(name=r["name"], count=int(r["count"])) for r in rows]
+    return [TagCount(id=int(r["id"]), name=r["name"], count=int(r["count"])) for r in rows]
 
 
 def list_authors_with_counts(conn: sqlite3.Connection) -> list[AuthorCount]:

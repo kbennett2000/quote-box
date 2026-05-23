@@ -156,7 +156,9 @@ def test_shuffle_ids_with_tag_filter(seeded_db: sqlite3.Connection) -> None:
 def test_list_tags_with_counts_sort_and_shape(seeded_db: sqlite3.Connection) -> None:
     tags = list_tags_with_counts(seeded_db)
     assert len(tags) == TOTAL_TAGS
-    assert tags[0] == {"name": "wisdom", "count": 4}
+    assert tags[0]["name"] == "wisdom"
+    assert tags[0]["count"] == 4
+    assert isinstance(tags[0]["id"], int)
     # Count=2 group ordered alphabetically: action, courage, life, philosophy
     count_2 = [t for t in tags if t["count"] == 2]
     assert [t["name"] for t in count_2] == ["action", "courage", "life", "philosophy"]
