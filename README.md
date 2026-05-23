@@ -1,16 +1,25 @@
 # quote-box
 
-A self-hosted, LAN-only web app for keeping a personal collection of
-quotes. Browse, search, and annotate them from any device on your
-home network; show them in a slideshow on a wall-mounted screen.
+A small home for the quotes you've collected — the lines you've copied
+out of books, the half-remembered passages from talks, the bits of
+conversation you didn't want to lose. Search and annotate them from
+any device on your home network. Put them on a slideshow on a TV in
+the kitchen.
 
-quote-box is designed to be installed on a Raspberry Pi, mini PC, or
-spare laptop running Ubuntu — and to stay running there for years
-without internet access.
+![A quote on display mode](docs/screenshots/display-mode.png)
+
+quote-box runs on a Raspberry Pi, a mini PC, or a laptop you're not
+using anymore. It doesn't talk to the internet, doesn't have an
+account to log into, doesn't update itself. It just sits there with
+your quotes, ready when you want them.
+
+![Browsing the collection](docs/screenshots/browse.png)
 
 ## Get started
 
-New install? Start with the [install guide](docs/install.md).
+New install? Start with the [install guide](docs/install.md). It
+walks through every command, with what to expect at each step, and
+assumes no prior terminal experience.
 
 ## Documentation
 
@@ -21,7 +30,6 @@ New install? Start with the [install guide](docs/install.md).
 | [Troubleshooting](docs/troubleshooting.md) | Common problems and how to fix them |
 | [Admin guide](docs/admin.md) | Backup, restore, database access, security |
 
-## About
+---
 
-The technical specification lives in [SPEC.md](SPEC.md) and
-engineering conventions in [CLAUDE.md](CLAUDE.md).
+<sub>Curious about the design? The feature spec lives in [SPEC.md](SPEC.md).</sub>
