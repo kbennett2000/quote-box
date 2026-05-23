@@ -111,13 +111,16 @@ Another program is using port 8035. See
 #### `Permission denied` on a file under `data/`
 
 The service user (`quote-box`) lost ownership of one of the data
-files. Re-set it:
+files. Re-set just `data/` and `backups/` — the source files don't
+need quote-box ownership:
 
 ```bash
 cd /path/to/quote-box
-sudo chown -R quote-box:quote-box .
+sudo chown -R quote-box:quote-box data backups
 sudo systemctl restart quote-box
 ```
+
+Re-running `sudo ./install.sh` also fixes this and is safe.
 
 #### `config.json not found`
 

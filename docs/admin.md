@@ -227,9 +227,12 @@ that.
 
 The systemd unit `install.sh` writes does apply a small amount of
 process hardening: `NoNewPrivileges`, `PrivateTmp`,
-`ProtectSystem=strict`, `ProtectHome`, and `ReadWritePaths` scoped
-to the data and backup directories. That's defense in depth against
-a compromised app process, not protection against a hostile network.
+`ProtectSystem=strict`, and `ReadWritePaths` scoped to the data and
+backup directories. (`ProtectHome` is deliberately not set —
+installing under `/home/<user>/...` is common, and that flag would
+make the service unable to see its own venv.) That's defense in
+depth against a compromised app process, not protection against a
+hostile network.
 
 ## Migrating to a new server
 
