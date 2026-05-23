@@ -134,7 +134,7 @@ Performance note: with 346 quotes (likely <2000 long-term), do filtering in SQL 
 
 A dedicated URL: `/display`. Designed for fullscreen on a TV or monitor.
 
-- **Layout**: one quote centered on the screen. Large, readable text. Author below, smaller. Source smaller still and italicized if present. Tags optional, off by default (toggleable via URL param `?tags=1`).
+- **Layout**: one quote centered on the screen. Large, readable text. Author below, smaller. Source smaller still and italicized if present. Tags optional, off by default (toggleable via URL param `?show_tags=1`).
 - **Rotation**: every N seconds (from config, default 20), advance to a new random quote. Avoid repeating until all quotes shown (shuffled queue, not pure random — prevents back-to-back repeats).
 - **Transition**: configurable. Default: fade out (300ms) + fade in (500ms) = `display_transition_ms` total budget. Implementation: CSS opacity transition.
 - **Visually pleasing** means:
@@ -151,6 +151,7 @@ A dedicated URL: `/display`. Designed for fullscreen on a TV or monitor.
   - `?duration=30` — override rotation seconds
   - `?tags=irish,wisdom` — restrict to quotes matching any of these tags
   - `?author=Voltaire` — restrict to one author
+  - `?show_tags=1` — render small tag chips below each quote (off by default)
   - `?nocontrols=1` — hide controls completely (true kiosk mode)
 - **Wake-lock**: use the [Screen Wake Lock API](https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API) so the display doesn't sleep. Where unsupported, the docs should note to disable screen sleep in the OS.
 
@@ -172,7 +173,9 @@ PUT    /api/quotes/:id                     # update
 DELETE /api/quotes/:id                     # delete
 
 GET    /api/quotes/random                  # one random quote (for display mode); supports same filters
-GET    /api/quotes/shuffle                 # returns a shuffled ordering of IDs (for display mode queue)
+GET    /api/quotes/shuffle                 # returns a shuffled ordering of IDs (for display mode queue);
+                                            # accepts ?tag_mode=or|and (default and). Display rotation
+                                            # passes or; browse paths use the default.
 
 GET    /api/tags                           # list with counts
 PUT    /api/tags/:id                       # rename
