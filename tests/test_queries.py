@@ -153,6 +153,22 @@ def test_shuffle_ids_with_tag_filter(seeded_db: sqlite3.Connection) -> None:
     assert len(set(ids)) == 4
 
 
+def test_shuffle_ids_tag_mode_or_is_superset_of_and(seeded_db: sqlite3.Connection) -> None:
+    # AND: only Marcus Aurelius is tagged both wisdom + life.
+    and_ids = shuffle_ids(seeded_db, tags=["wisdom", "life"], tag_mode="and")
+    or_ids = shuffle_ids(seeded_db, tags=["wisdom", "life"], tag_mode="or")
+    assert len(and_ids) == 1
+    # OR: 4 wisdom + 2 life, deduped to 5 (Marcus appears in both groups).
+    assert len(or_ids) == 5
+    assert set(and_ids).issubset(set(or_ids))
+
+
+def test_shuffle_ids_default_tag_mode_matches_and(seeded_db: sqlite3.Connection) -> None:
+    default = shuffle_ids(seeded_db, tags=["wisdom", "life"])
+    explicit_and = shuffle_ids(seeded_db, tags=["wisdom", "life"], tag_mode="and")
+    assert set(default) == set(explicit_and)
+
+
 def test_list_tags_with_counts_sort_and_shape(seeded_db: sqlite3.Connection) -> None:
     tags = list_tags_with_counts(seeded_db)
     assert len(tags) == TOTAL_TAGS

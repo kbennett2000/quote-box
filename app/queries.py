@@ -87,12 +87,15 @@ def _build_filter_clause(
     q: str | None,
     tags: Sequence[str] | None,
     author: str | None,
+    *,
+    tag_mode: str = "and",
 ) -> tuple[str, list[Any]]:
     """Return a ``WHERE ...`` SQL fragment and parameters for filtering quotes.
 
-    The fragment is built around the ``quotes q`` alias and includes a subquery
-    join for tag-AND so the caller does not need to add its own GROUP BY.
-    Returns ``("", [])`` when no filters apply.
+    The fragment is built around the ``quotes q`` alias. With ``tag_mode="and"``
+    the subquery requires every tag to match (browse semantics); with
+    ``tag_mode="or"`` any matching tag is enough (display rotation). Returns
+    ``("", [])`` when no filters apply.
     """
     clauses: list[str] = []
     params: list[Any] = []
@@ -113,16 +116,25 @@ def _build_filter_clause(
     if tags:
         unique_tags = _dedup_preserve_order(tags)
         placeholders = ", ".join("?" for _ in unique_tags)
-        clauses.append(
-            f"q.id IN ("
-            f"SELECT qt.quote_id FROM quote_tags qt "
-            f"JOIN tags t ON t.id = qt.tag_id "
-            f"WHERE t.name IN ({placeholders}) "
-            f"GROUP BY qt.quote_id "
-            f"HAVING COUNT(DISTINCT t.name) = ?)"
-        )
-        params.extend(unique_tags)
-        params.append(len(unique_tags))
+        if tag_mode == "or":
+            clauses.append(
+                f"q.id IN ("
+                f"SELECT qt.quote_id FROM quote_tags qt "
+                f"JOIN tags t ON t.id = qt.tag_id "
+                f"WHERE t.name IN ({placeholders}))"
+            )
+            params.extend(unique_tags)
+        else:
+            clauses.append(
+                f"q.id IN ("
+                f"SELECT qt.quote_id FROM quote_tags qt "
+                f"JOIN tags t ON t.id = qt.tag_id "
+                f"WHERE t.name IN ({placeholders}) "
+                f"GROUP BY qt.quote_id "
+                f"HAVING COUNT(DISTINCT t.name) = ?)"
+            )
+            params.extend(unique_tags)
+            params.append(len(unique_tags))
 
     if not clauses:
         return "", []
@@ -212,8 +224,9 @@ def shuffle_ids(
     *,
     tags: Sequence[str] | None = None,
     author: str | None = None,
+    tag_mode: str = "and",
 ) -> list[str]:
-    where, params = _build_filter_clause(None, tags, author)
+    where, params = _build_filter_clause(None, tags, author, tag_mode=tag_mode)
     rows = conn.execute(f"SELECT q.id FROM quotes q {where} ORDER BY RANDOM()", params).fetchall()
     return [r["id"] for r in rows]
 

@@ -139,3 +139,22 @@ def test_shuffle_empty_filter_returns_empty_list_not_404(client: FlaskClient) ->
     resp = client.get("/api/quotes/shuffle?author=Nobody")
     assert resp.status_code == 200
     assert resp.get_json() == {"ids": []}
+
+
+def test_shuffle_tag_mode_or_returns_more_than_and(client: FlaskClient) -> None:
+    and_resp = client.get("/api/quotes/shuffle?tags=wisdom,life&tag_mode=and")
+    or_resp = client.get("/api/quotes/shuffle?tags=wisdom,life&tag_mode=or")
+    assert and_resp.status_code == or_resp.status_code == 200
+    assert len(or_resp.get_json()["ids"]) > len(and_resp.get_json()["ids"])
+
+
+def test_shuffle_tag_mode_default_is_and(client: FlaskClient) -> None:
+    default_resp = client.get("/api/quotes/shuffle?tags=wisdom,life")
+    and_resp = client.get("/api/quotes/shuffle?tags=wisdom,life&tag_mode=and")
+    assert set(default_resp.get_json()["ids"]) == set(and_resp.get_json()["ids"])
+
+
+def test_shuffle_invalid_tag_mode_returns_400(client: FlaskClient) -> None:
+    resp = client.get("/api/quotes/shuffle?tag_mode=junk")
+    assert resp.status_code == 400
+    assert "tag_mode" in resp.get_json()["error"]

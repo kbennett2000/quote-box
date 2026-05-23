@@ -111,10 +111,14 @@ def random_quote() -> ResponseReturnValue:
 
 @bp.get("/api/quotes/shuffle")
 def shuffle_ids() -> ResponseReturnValue:
+    tag_mode = request.args.get("tag_mode", "and").strip().lower() or "and"
+    if tag_mode not in {"and", "or"}:
+        return {"error": "tag_mode must be 'and' or 'or'"}, 400
     ids = queries.shuffle_ids(
         get_db(),
         tags=_parse_tags(request.args.get("tags")) or None,
         author=_parse_str(request.args.get("author")),
+        tag_mode=tag_mode,
     )
     return {"ids": ids}
 
