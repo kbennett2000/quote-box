@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Who's reading? — quote-box{% endblock %}
+
+{% block content %}
+<section class="picker">
+  <h1 class="picker-heading">Who's reading?</h1>
+
+  {% if profiles %}
+    <ul class="picker-grid">
+      {% for p in profiles %}
+        <li>
+          <form action="/profile/select" method="post">
+            <input type="hidden" name="existing_id" value="{{ p.id }}">
+            <input type="hidden" name="next" value="{{ next }}">
+            <button type="submit" class="picker-button">{{ p.name }}</button>
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="picker-empty">No profiles yet — create one to begin.</p>
+  {% endif %}
+
+  <h2 class="picker-subheading">
+    {% if profiles %}Or create a new profile{% else %}Create a profile{% endif %}
+  </h2>
+
+  {% if error %}
+    <p class="picker-error" role="alert">{{ error }}</p>
+  {% endif %}
+
+  <form class="new-profile-form" action="/profile/select" method="post">
+    <input type="hidden" name="next" value="{{ next }}">
+    <input class="new-profile-name"
+           type="text"
+           name="name"
+           maxlength="50"
+           autocomplete="off"
+           required
+           placeholder="Your name"
+           value="{{ form_name }}">
+    <button type="submit" class="new-profile-submit">Create</button>
+  </form>
+</section>
+{% endblock %}

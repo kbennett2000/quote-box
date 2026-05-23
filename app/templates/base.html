@@ -12,7 +12,12 @@
     <div class="site-header-inner">
       <a class="site-wordmark" href="/">Quotes</a>
       <nav class="site-nav">
-        <a href="#" aria-disabled="true">Profile</a>
+        {% if current_profile %}
+          <span class="profile-badge">{{ current_profile.name }}</span>
+          <form action="/profile/switch" method="post" class="switch-form">
+            <button type="submit" class="switch-link">Switch</button>
+          </form>
+        {% endif %}
       </nav>
     </div>
   </header>

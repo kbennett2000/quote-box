@@ -82,3 +82,16 @@ def client(app: Flask) -> Iterator[FlaskClient]:
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
+
+
+@pytest.fixture
+def profile(client: FlaskClient) -> dict[str, object]:
+    body = client.post("/api/profiles", json={"name": "tester"}).get_json()
+    assert isinstance(body, dict)
+    return body
+
+
+@pytest.fixture
+def client_with_profile(client: FlaskClient, profile: dict[str, object]) -> FlaskClient:
+    client.set_cookie("quote_box_profile_id", str(profile["id"]))
+    return client
