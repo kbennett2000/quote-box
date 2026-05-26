@@ -204,23 +204,27 @@ The contents stay unlistable to other users; only the path becomes
 walkable. quote-box itself is owned by `quote-box:quote-box` inside
 that dir, so listing requires its own permissions anyway.
 
-#### `Permission denied` when removing the project folder
+#### `Permission denied` when removing the project folder, or `git pull` fails to unlink files
 
 If you ran an older installer that did `chown -R quote-box:quote-box`
-on the whole project tree, you'll be unable to `rm -rf` your clone
-without `sudo` — your user no longer owns the files.
+on the whole project tree (including the install directory itself),
+you'll be unable to `rm -rf` your clone without `sudo`, and
+`git pull` will fail with `unable to unlink old '<file>'` because
+git needs write permission on the containing directory.
 
 Current installers chown only `data/` and `backups/` to the service
-user; everything else stays owned by the user who ran `sudo
-./install.sh`. To fix an older install:
+user; everything else (the install directory itself plus its source
+files, config, and venv) stays owned by the user who ran
+`sudo ./install.sh`. Re-running the installer recovers from the
+dangling-ownership state automatically:
 
 ```bash
-sudo chown -R yourusername:yourusername /path/to/quote-box
+cd /path/to/quote-box
+sudo ./install.sh
 ```
 
-After this you can `git pull`, edit files, and `rm -rf` the project
-normally. Re-running `sudo ./install.sh` will set up the narrower
-ownership.
+After it finishes you can `git pull`, edit files, and `rm -rf` the
+project normally as your own user.
 
 ## Port already in use <a id="port-in-use"></a>
 

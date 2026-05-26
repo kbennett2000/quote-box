@@ -131,6 +131,14 @@ set_ownership() {
     local owner="${SUDO_USER:-root}"
     local owner_group
     owner_group="$(id -gn "$owner" 2>/dev/null || echo "$owner")"
+
+    # Fix the install dir's own ownership first — the find -mindepth 1
+    # below operates on its CONTENTS and skips the directory itself, so
+    # if the dir drifted (e.g. a previous wide chown to quote-box), it
+    # would stay broken and subsequent git pull would fail to unlink
+    # files because git needs write on the containing directory.
+    chown "$owner:$owner_group" "$INSTALL_DIR"
+
     find "$INSTALL_DIR" -mindepth 1 -maxdepth 1 \
         ! -name data ! -name backups \
         -exec chown -R "$owner:$owner_group" {} +
