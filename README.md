@@ -1,5 +1,7 @@
 # quote-box
 
+*Self-hosted, offline-first quote manager with a fullscreen kiosk slideshow — Flask + SQLite, no build step, runs on a Raspberry Pi.*
+
 A small home for the quotes you've collected — the lines you've copied
 out of books, the half-remembered passages from talks, the bits of
 conversation you didn't want to lose. Search and annotate them from
@@ -29,6 +31,18 @@ assumes no prior terminal experience.
 | [User guide](docs/user-guide.md) | Using the app from any device on your network |
 | [Troubleshooting](docs/troubleshooting.md) | Common problems and how to fix them |
 | [Admin guide](docs/admin.md) | Backup, restore, database access, security |
+
+## Features
+
+- **Browse & search** your whole collection — full-text search across quote, author, and source, with tag and author filters.
+- **Free-form tags** and per-quote organization, plus a tags page to rename and tidy.
+- **Per-profile notes** — annotate quotes; everyone on the network sees each other's notes, but you only edit your own.
+- **Fullscreen kiosk display mode** for a TV or wall screen: a gentle rotating slideshow with curly typography, a dark theme, and screen wake-lock so the display never sleeps. Tune it from the URL — `?duration=30`, `?tags=irish,wisdom`, `?author=Voltaire`, `?nocontrols=1`.
+- **No accounts, no internet, no fuss** — bind it to your LAN and forget it.
+
+## Built with
+
+Python · Flask · Jinja2 · SQLite · vanilla JS & CSS · systemd — *no npm, no build step, no internet calls at runtime.*
 
 ---
 
