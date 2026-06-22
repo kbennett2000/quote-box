@@ -1,4 +1,15 @@
+<p align="center">
+  <img src="docs/banner.png" alt="quote-box" width="100%">
+</p>
+
 # quote-box
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-2C3E5C" alt="License: MIT">
+  <img src="https://img.shields.io/badge/python-3.10%2B-2C3E5C" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/runtime-offline--first-2C3E5C" alt="Offline-first">
+  <img src="https://img.shields.io/badge/build-none-2C3E5C" alt="No build step">
+</p>
 
 *Self-hosted, offline-first quote manager with a fullscreen kiosk slideshow — Flask + SQLite, no build step, runs on a Raspberry Pi.*
 
